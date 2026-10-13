@@ -2,7 +2,20 @@
 
 Private Sites application with a full-screen browser CAD workspace, Three.js viewport, JSCAD constructive solid geometry, editable feature history, manual dimensions/transforms/patterns/polygon extrusions, undo/redo, browser-local persistence, JSON project import/export, and STL export.
 
-Cloud AI is invoked by the authenticated Worker route `/api/generate`. It sends the current feature graph and design request to OpenAI Responses using a strict JSON schema. The browser validates and compiles the complete proposed graph before offering Apply. No generated code is executed. `OPENAI_API_KEY` is a Sites runtime secret. Optional `CAD_AI_MODEL` overrides the default `gpt-5-mini`. API credits are required; the initial smoke test returned `credit_balance_exhausted`.
+Cloud AI is invoked by the authenticated Worker route `/api/generate`. A provider picker supports Gemini, Groq, OpenRouter, and OpenAI. The same structured CAD schema, geometry validation, and preview/accept/deny workflow are used for all providers. Gemini is the default; a missing key produces a connection message, not a simulated response or automatic paid fallback. Provider requests run only on the server, with credentials supplied as runtime secrets.
+
+| Provider | Runtime secret | Default model |
+| --- | --- | --- |
+| Gemini | `GEMINI_API_KEY` | `gemini-3.8-flash` |
+| Groq | `GROQ_API_KEY` | `openai/gpt-oss-120b` |
+| OpenRouter | `OPENROUTER_API_KEY` | `openrouter/free` |
+| OpenAI | `OPENAI_API_KEY` | `gpt-5-mini` |
+
+`CAD_AI_PROVIDER` selects the default provider. Optional `GEMINI_CAD_MODEL`, `GROQ_CAD_MODEL`, `OPENROUTER_CAD_MODEL`, and `OPENAI_CAD_MODEL` override models. OpenRouter overrides must be `openrouter/free` or end in `:free`; no automatic fallback to a paid provider is implemented. Other providers can bill according to their account tier; free usage depends on provider account quotas, model eligibility, and billing settings. Configure a free-tier provider account for no-cost usage.
+
+At implementation time, the alternative-provider keys are not connected. Gemini/Groq/OpenRouter payload and response adapters were tested using simulated provider responses; live inference cannot be validated until a key is configured. The existing OpenAI account returned `credit_balance_exhausted`. Google documents that free-tier inputs can be used to improve its products; review provider terms before submitting confidential CAD data.
+
+Provider documentation: [Gemini pricing](https://ai.google.dev/gemini-api/docs/pricing), [Gemini structured output](https://ai.google.dev/gemini-api/docs/structured-output), [Groq structured output](https://console.groq.com/docs/structured-outputs), [Groq free-plan limits](https://console.groq.com/docs/rate-limits), [OpenRouter free router](https://openrouter.ai/openrouter/free). Model defaults and tiers reflect these references checked October 13, 2026.
 
 ## Build and verify
 
