@@ -1,0 +1,10 @@
+dist/
+site.tar.gz
+
+node_modules/
+.app-bundle.js
+.env*
+!.env.example
+*.pem
+
+worker/index.js
